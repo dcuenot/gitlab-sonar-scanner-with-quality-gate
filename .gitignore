@@ -1,0 +1,5 @@
+/target
+/proptest-regressions
+
+**/*.iml
+.vscode
