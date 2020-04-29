@@ -60,17 +60,17 @@ impl Condition {
     }
 
     fn display_comparator(&self, high: bool) -> &str {
-        return match (high, self.comparator.as_str()) {
+        match (high, self.comparator.as_str()) {
             (true, "GT") => "<",
             (true, "LT") => "≥",
             (false, "GT") => "≥",
             (false, "LT") => "<",
             _ => &self.comparator,
-        };
+        }
     }
 
     fn display_rating(rating: &str) -> &str {
-        return match rating {
+        match rating {
             "1" => "A",
             "2" => "B",
             "3" => "C",
@@ -78,7 +78,7 @@ impl Condition {
             "5" => "E",
             "6" => "7",
             _ => rating,
-        };
+        }
     }
 
     fn display_metric_key(&self) -> String {
@@ -86,7 +86,7 @@ impl Condition {
     }
 
     fn display_assertion(&self) -> String {
-        return match &self.metric_key {
+        match &self.metric_key {
             x if (x == "coverage" || x == "duplicated_lines_density") => self.percentage(true),
             x if (x.contains("coverage") || x.contains("density")) => self.percentage(false),
             x if x.ends_with("rating") => self.display_ratings(),
@@ -96,7 +96,7 @@ impl Condition {
                 &self.display_comparator(false),
                 &self.error_threshold
             ),
-        };
+        }
     }
 
     fn display_ratings(&self) -> String {
