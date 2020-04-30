@@ -100,8 +100,8 @@ impl Condition {
     }
 
     fn display_ratings(&self) -> String {
-        if &self.actual_value == &self.error_threshold {
-            return format!("{}", Condition::display_rating(&self.actual_value));
+        if self.actual_value == self.error_threshold {
+            return Condition::display_rating(&self.actual_value).into();
         }
         format!(
             "{} {} {}",
