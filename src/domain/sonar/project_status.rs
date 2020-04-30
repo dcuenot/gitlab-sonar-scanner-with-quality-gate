@@ -23,9 +23,10 @@ impl ProjectStatus {
     }
 
     fn format_quality_status(status: String) -> &'static str {
-        match status == "OK" {
-            true => "✅ Quality Gate passed",
-            false => "⛔️ Quality Gate failed",
+        if status == "OK" {
+            "✅ Quality Gate passed"
+        } else {
+            "⛔️ Quality Gate failed"
         }
     }
 
