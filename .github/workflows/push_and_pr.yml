@@ -28,47 +28,31 @@ jobs:
       matrix:
         rust:
           - stable
-          - nightly
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
-          profile: minimal
           toolchain: ${{ matrix.rust }}
           override: true
       - uses: actions-rs/cargo@v1
         with:
           command: test
+      - name: Run cargo-tarpaulin
+        uses: actions-rs/tarpaulin@v0.1
+        with:
+          version: '0.9.0'
+          args: '-- --test-threads 1'
 
-  lint:
-    name: Code coverage
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        rust:
-          - nightly
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v1.0.2
         with:
-          toolchain: nightly
-          override: true
-      - uses: actions-rs/cargo@v1
+          token: ${{secrets.CODECOV_TOKEN}}
+
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v1
         with:
-          command: clean
-      - uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --all-features --no-fail-fast
-        env:
-          CARGO_INCREMENTAL: '0'
-          RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Zno-landing-pads'
-      - id: coverage
-        uses: actions-rs/grcov@v0.1
-      - uses: codecov/codecov-action@v1
-        with:
-          file: ${{ steps.coverage.outputs.report }}
-          fail_ci_if_error: true
+          name: code-coverage-report
+          path: cobertura.xml
 
   fmt:
     name: Rustfmt
