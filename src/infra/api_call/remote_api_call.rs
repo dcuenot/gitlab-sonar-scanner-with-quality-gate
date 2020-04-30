@@ -16,6 +16,5 @@ pub async fn send_request<T: DeserializeOwned>(
     }
 
     let resp = response.json::<T>();
-
     Ok(resp.await?)
 }

@@ -59,11 +59,11 @@ impl Condition {
         "❌"
     }
 
-    fn display_comparator(&self, high: bool) -> &str {
-        match (high, self.comparator.as_str()) {
+    fn display_comparator(&self) -> &str {
+        match (self.is_ok(), self.comparator.as_str()) {
             (true, "GT") => "<",
-            (true, "LT") => "≥",
             (false, "GT") => "≥",
+            (true, "LT") => "≥",
             (false, "LT") => "<",
             _ => &self.comparator,
         }
@@ -87,38 +87,36 @@ impl Condition {
 
     fn display_assertion(&self) -> String {
         match &self.metric_key {
-            x if (x == "coverage" || x == "duplicated_lines_density") => self.percentage(true),
-            x if (x.contains("coverage") || x.contains("density")) => self.percentage(false),
+            x if (x.contains("coverage") || x.contains("density")) => self.percentage(),
             x if x.ends_with("rating") => self.display_ratings(),
             _ => format!(
                 "{} {} {}",
                 &self.actual_value,
-                &self.display_comparator(false),
+                &self.display_comparator(),
                 &self.error_threshold
             ),
         }
     }
 
     fn display_ratings(&self) -> String {
-        if self.actual_value == self.error_threshold {
-            return Condition::display_rating(&self.actual_value).into();
+        let rating_actual = Condition::display_rating(&self.actual_value).into();
+        let rating_threshold = Condition::display_rating(&self.error_threshold);
+
+        match (self.is_ok(), self.actual_value == self.error_threshold) {
+            (_, true) => rating_actual,
+            (true, _) => format!("{} is better than {}", rating_actual, rating_threshold),
+            (false, _) => format!("{} is worse than {}", rating_actual, rating_threshold),
         }
-        format!(
-            "{} {} {}",
-            Condition::display_rating(&self.actual_value),
-            &self.display_comparator(true),
-            Condition::display_rating(&self.error_threshold)
-        )
     }
 
-    fn percentage(&self, high: bool) -> String {
+    fn percentage(&self) -> String {
         let actual = &self.actual_value.parse::<f32>().unwrap();
         let error_threshold = &self.error_threshold.parse::<f32>().unwrap();
 
         format!(
             "{:.0}% {} {:.0}%",
             actual,
-            &self.display_comparator(high),
+            &self.display_comparator(),
             error_threshold
         )
     }
@@ -140,7 +138,7 @@ mod tests {
 
     #[test]
     fn a_KO_status_should_display_a_red_cross() {
-        let given = ConditionBuilder::new().with_status("KO").build();
+        let given = ConditionBuilder::new().with_status("ERROR").build();
         assert_contains(given.display(), "❌")
     }
 
@@ -171,6 +169,84 @@ mod tests {
                 &format!("({})", Condition::display_rating(s)),
             );
         }
+    }
+
+    #[test]
+    fn reliability_rating_with_1_LT_2_should_display_A_better_B() {
+        let given = ConditionBuilder::new()
+            .with_metric_key("reliability_rating")
+            .with_comparaison("1", "LT", "2")
+            .build();
+        assert_contains(
+            given.display(),
+            "✅ Reliability rating (A is better than B)",
+        )
+    }
+
+    #[test]
+    fn new_reliability_rating_with_4_GT_1_should_display_D_worse_B() {
+        let given = ConditionBuilder::new()
+            .with_metric_key("new_reliability_rating")
+            .with_status("ERROR")
+            .with_comparaison("4", "GT", "2")
+            .build();
+        assert_contains(
+            given.display(),
+            "❌ New reliability rating (D is worse than B)",
+        )
+    }
+
+    #[test]
+    fn random_should_display_with_fallback_display() {
+        let given = ConditionBuilder::new()
+            .with_metric_key("random")
+            .with_status("OK")
+            .with_comparaison("4", "GT", "298")
+            .build();
+        assert_contains(given.display(), "✅ Random (4 < 298)")
+    }
+
+    #[test]
+    fn new_coverage_with_0_LT_80_should_display_0percent_lt_80percent() {
+        let given = ConditionBuilder::new()
+            .with_metric_key("new_coverage")
+            .with_status("ERROR")
+            .with_comparaison("0.0", "LT", "80")
+            .build();
+        assert_contains(given.display(), "❌ New coverage (0% < 80%)")
+    }
+
+    #[test]
+    fn new_duplicated_lines_density_with_6_33162_GT_3_should_display_6percent_gte_3percent() {
+        let given = ConditionBuilder::new()
+            .with_metric_key("new_duplicated_lines_density")
+            .with_status("ERROR")
+            .with_comparaison("0.0", "LT", "80")
+            .build();
+        assert_contains(
+            given.display(),
+            "❌ New duplicated lines density (0% < 80%)",
+        )
+    }
+
+    #[test]
+    fn coverage_with_85_8_LT_80_should_display_86percent_gte_80percent() {
+        let given = ConditionBuilder::new()
+            .with_metric_key("coverage")
+            .with_status("OK")
+            .with_comparaison("85.8", "LT", "80")
+            .build();
+        assert_contains(given.display(), "✅ Coverage (86% ≥ 80%)")
+    }
+
+    #[test]
+    fn duplicated_lines_density_with_0_GT_3_should_display_6percent_gte_3percent() {
+        let given = ConditionBuilder::new()
+            .with_metric_key("duplicated_lines_density")
+            .with_status("OK")
+            .with_comparaison("0.0", "GT", "3")
+            .build();
+        assert_contains(given.display(), "✅ Duplicated lines density (0% < 3%)")
     }
 
     struct ConditionBuilder<'a> {
