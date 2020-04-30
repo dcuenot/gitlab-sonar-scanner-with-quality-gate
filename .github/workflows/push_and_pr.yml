@@ -43,7 +43,7 @@ jobs:
           version: '0.12.3'
 
       - name: Upload to codecov.io
-        uses: codecov/codecov-action@v1.0.2
+        uses: codecov/codecov-action@v1
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v1
