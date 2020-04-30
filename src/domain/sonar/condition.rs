@@ -2,21 +2,6 @@ extern crate inflector;
 use inflector::Inflector;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct QualityStatus {
-    #[serde(rename = "projectStatus")]
-    pub project_status: ProjectStatus,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ProjectStatus {
-    pub status: String,
-    pub conditions: Vec<Condition>,
-    periods: Vec<Period>,
-    #[serde(rename = "ignoredConditions")]
-    ignored_conditions: bool,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
 pub struct Condition {
     status: String,
     #[serde(rename = "metricKey")]
@@ -26,13 +11,6 @@ pub struct Condition {
     error_threshold: String,
     #[serde(rename = "actualValue")]
     actual_value: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Period {
-    index: i64,
-    mode: String,
-    date: String,
 }
 
 impl Condition {
