@@ -1,7 +1,9 @@
 extern crate inflector;
 use inflector::Inflector;
 
-#[derive(Debug, Serialize, Deserialize)]
+use std::cmp::Ordering;
+
+#[derive(Debug, Serialize, Deserialize, Eq, Clone)]
 pub struct Condition {
     status: String,
     #[serde(rename = "metricKey")]
@@ -13,8 +15,26 @@ pub struct Condition {
     actual_value: String,
 }
 
+impl PartialOrd for Condition {
+    fn partial_cmp(&self, other: &Condition) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Condition {
+    fn cmp(&self, other: &Condition) -> Ordering {
+        self.status.cmp(&other.status)
+    }
+}
+
+impl PartialEq for Condition {
+    fn eq(&self, other: &Condition) -> bool {
+        self.status == other.status
+    }
+}
+
 impl Condition {
-    pub fn display(&self) -> String {
+    pub(super) fn display(&self) -> String {
         format!(
             "{} {} ({})",
             &self.display_status(),
@@ -103,7 +123,7 @@ impl Condition {
 // ⛔️✅⚠️❌
 #[cfg(test)]
 #[allow(non_snake_case)]
-mod tests {
+pub(super) mod tests {
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
     use proptest::prelude::*;
@@ -227,7 +247,7 @@ mod tests {
         assert_contains(given.display(), "✅ Duplicated lines density (0% < 3%)")
     }
 
-    struct ConditionBuilder<'a> {
+    pub(in crate::domain) struct ConditionBuilder<'a> {
         status: &'a str,
         metric_key: &'a str,
         comparator: &'a str,
@@ -246,17 +266,17 @@ mod tests {
             }
         }
 
-        pub fn with_status(&mut self, status: &'a str) -> &mut Self {
+        pub(in crate::domain) fn with_status(&mut self, status: &'a str) -> &mut Self {
             self.status = status;
             self
         }
 
-        pub fn with_metric_key(&mut self, metric_key: &'a str) -> &mut Self {
+        pub(in crate::domain) fn with_metric_key(&mut self, metric_key: &'a str) -> &mut Self {
             self.metric_key = metric_key;
             self
         }
 
-        pub fn with_comparaison(
+        pub(in crate::domain) fn with_comparaison(
             &mut self,
             actual_value: &'a str,
             comparator: &'a str,
@@ -268,7 +288,7 @@ mod tests {
             self
         }
 
-        pub fn build(&self) -> Condition {
+        pub(in crate::domain) fn build(&self) -> Condition {
             Condition {
                 status: self.status.into(),
                 metric_key: self.metric_key.to_string(),
@@ -279,9 +299,7 @@ mod tests {
         }
     }
 
-    fn assert_contains(result: String, expected: &str) {
-        println!("{} {}", result, expected);
-
+    pub(in crate::domain) fn assert_contains(result: String, expected: &str) {
         if !result.contains(expected) {
             panic!(
                 r#"assertion failed: `result.contains(expected)`
