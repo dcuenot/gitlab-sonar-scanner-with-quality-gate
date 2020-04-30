@@ -20,6 +20,6 @@ pub fn yolo(analysis_id: &str) -> Result<QualityStatus, Error> {
     rt.block_on(async move { sonar_client.quality_gate_status(analysis_id).await })
 }
 
-fn get_env_var<'a>(env_var_name: &str, default_value: &str) -> String {
-    var(env_var_name).unwrap_or(default_value.into())
+fn get_env_var(env_var_name: &str, default_value: &str) -> String {
+    var(env_var_name).unwrap_or_else(|_| default_value.into())
 }
