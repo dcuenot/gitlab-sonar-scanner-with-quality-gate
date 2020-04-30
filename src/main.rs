@@ -1,19 +1,19 @@
 extern crate sonar_qg;
 
 fn main() {
-    println!("");
+    println!();
     println!("-- Rating + Coverage/Density");
     plop("AXHBx8zuhJIgoSnA8Nfq");
-    println!("");
+    println!();
 
     println!("-- Rating + Coverage/Density");
     plop("AXHBYMjbhJIgoSnA5MjW");
-    println!("");
+    println!();
 
     plop("AXHBx8zuhJIgoSnA8Nfq");
-    println!("");
+    println!();
     plop("AXEbnWAohJIgoSnALzRU");
-    println!("");
+    println!();
 
     println!("-- Nb + new Coverage");
     plop("AW-kZyhitad4bcXnikLH")
