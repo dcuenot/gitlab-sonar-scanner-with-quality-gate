@@ -1,4 +1,4 @@
-extern crate display_in_gitlab_merge_request;
+extern crate sonar_qg;
 
 fn main() {
     println!("-- Rating + Coverage/Density");
@@ -12,7 +12,7 @@ fn main() {
 }
 
 fn plop(id: &str) {
-    match display_in_gitlab_merge_request::yolo(id) {
+    match sonar_qg::yolo(id) {
         Ok(result) => {
             for x in &result.project_status.conditions {
                 println!("{}", x.display());

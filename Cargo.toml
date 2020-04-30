@@ -1,5 +1,5 @@
 [package]
-name = "display-in-gitlab-merge-request"
+name = "sonar_qg"
 version = "0.1.0"
 authors = ["Damien Cuenot <damien.cuenot@live.com>"]
 edition = "2018"

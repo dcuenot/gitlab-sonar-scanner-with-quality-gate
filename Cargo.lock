@@ -126,19 +126,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b3a71ab494c0b5b860bdc8407ae08978052417070c2ced38573a9157ad75b8ac"
 
 [[package]]
-name = "display-in-gitlab-merge-request"
-version = "0.1.0"
-dependencies = [
- "Inflector",
- "anyhow",
- "proptest",
- "reqwest",
- "serde",
- "serde_derive",
- "tokio",
-]
-
-[[package]]
 name = "dtoa"
 version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1049,6 +1036,19 @@ dependencies = [
  "libc",
  "redox_syscall",
  "winapi 0.3.8",
+]
+
+[[package]]
+name = "sonar_qg"
+version = "0.1.0"
+dependencies = [
+ "Inflector",
+ "anyhow",
+ "proptest",
+ "reqwest",
+ "serde",
+ "serde_derive",
+ "tokio",
 ]
 
 [[package]]
