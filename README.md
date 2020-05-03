@@ -5,6 +5,24 @@
 [![codecov](https://codecov.io/gh/dcuenot/sonar-qg-in-cli/branch/master/graph/badge.svg)](https://codecov.io/gh/dcuenot/sonar-qg-in-cli)
 
 
+# CLI description
+```
+Sonar Quality Gate CLI 0.1.0
 
-Output of CLI
+USAGE:
+    sonar_qg [FLAGS] [OPTIONS] --sonar_analysis_id <sonar-analysis-id> --sonar_token <sonar-token> --sonar_url <sonar-url>
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+    -v, --verbose    Verbose mode (-v, -vv, -vvv, etc.)
+
+OPTIONS:
+    -g, --gitlab_private_token <gitlab-private-token>     [env: GITLAB_PRIVATE_TOKEN=]
+    -i, --sonar_analysis_id <sonar-analysis-id>          
+    -t, --sonar_token <sonar-token>                       [env: SONAR_TOKEN=]
+    -u, --sonar_url <sonar-url>                           [env: SONAR_URL=]
+```
+
+# Sample of output
 ![Output](docs/cli_result.png?raw=true "CLI Output")
