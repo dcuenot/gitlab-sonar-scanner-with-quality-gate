@@ -31,7 +31,12 @@ struct Options {
 fn main() {
     let options = Options::from_args();
 
-    match yolo(options.sonar_url, options.sonar_token, options.sonar_analysis_id, options.gitlab_private_token) {
+    match yolo(
+        options.sonar_url,
+        options.sonar_token,
+        options.sonar_analysis_id,
+        options.gitlab_private_token,
+    ) {
         Ok(result) => {
             // println!("{:#?}", &result);
             println!("{}", result.display());

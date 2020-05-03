@@ -13,7 +13,7 @@ pub fn yolo(
     sonar_url: String,
     sonar_token: String,
     sonar_analysis_id: String,
-    gitlab_private_token: Option<String>,
+    _gitlab_private_token: Option<String>,
 ) -> Result<QualityStatus, Error> {
     let sonar_client = SonarClient::new(&sonar_url, &sonar_token);
 
