@@ -1,0 +1,89 @@
+on:
+  push:
+  # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+# https://github.com/cmsd2/example-cli/blob/master/.github/workflows/rust.yml
+
+name: Create Release
+
+jobs:
+  create_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create Release in Github
+        id: create_github_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: false
+          prerelease: false
+    outputs:
+        upload_url_github: ${{ steps.create_github_release.outputs.upload_url }}
+  publish_artifact:
+    name: Publish Artifacts cross platform
+    needs: create_release
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+            profile: minimal
+            toolchain: stable
+            override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --verbose
+
+      - name: Upload Unix Binary
+        id: upload-release-asset-unix
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            upload_url: ${{ needs.create_release.outputs.upload_url_github }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+            asset_path: target/release/sonar_qg
+            asset_name: sonar-quality-gate-linux-x86_64
+            asset_content_type: application/x-elf
+      
+
+      - name: Upload MacOs Binary
+        id: upload-release-asset-macos
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            upload_url: ${{ needs.create_release.outputs.upload_url_github }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+            asset_path: target/release/sonar_qg
+            asset_name: sonar-quality-gate-darwin-x86_64
+            asset_content_type: application/x-mach-binary
+            
+      - name: Upload Windows Binary
+        id: upload-release-asset-windows
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            upload_url: ${{ needs.create_release.outputs.upload_url_github }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+            asset_path: target/release/sonar_qg.exe
+            asset_name: sonar-quality-gate-windows-x86_64.exe
+            asset_content_type: application/vnd.microsoft.portable-executable
