@@ -1,30 +1,22 @@
 extern crate sonar_qg;
 
-fn main() {
-    println!();
-    println!("-- Rating + Coverage/Density");
-    plop("AXHBx8zuhJIgoSnA8Nfq");
-    println!();
+use structopt::StructOpt;
+      
+#[derive(StructOpt, Debug)]
+#[structopt(name = "Some CLI tool")]
+struct Options {
+    // normal comments are just comments
+    /// doc comments get turned into help
+    #[structopt(short = "e", long = "example")]
+    example: bool,
 
-    println!("-- Rating + Coverage/Density");
-    plop("AXHBYMjbhJIgoSnA5MjW");
-    println!();
-
-    plop("AXHBx8zuhJIgoSnA8Nfq");
-    println!();
-    plop("AXEbnWAohJIgoSnALzRU");
-    println!();
-
-    println!("-- Nb + new Coverage");
-    plop("AW-kZyhitad4bcXnikLH")
+    // The number of occurrences of the `v/verbose` flag
+    /// Verbose mode (-v, -vv, -vvv, etc.)
+    #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
+    verbose: u8,
 }
 
-fn plop(id: &str) {
-    match sonar_qg::yolo(id) {
-        Ok(result) => {
-            // println!("{:#?}", &result);
-            println!("{}", result.display());
-        }
-        Err(e) => println!("MY Error: {:#?}", e),
-    };
+fn main() {
+    let options = Options::from_args();
+    println!("{:?}", options);
 }
