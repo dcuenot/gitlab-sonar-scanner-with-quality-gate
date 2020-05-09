@@ -51,6 +51,23 @@ jobs:
           command: build
           args: --release --verbose
 
+      - name: Import Code-Signing Certificates
+        uses: apple-actions/import-codesign-certs@v1
+        with:
+          p12-file-base64: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_P12_BASE64 }}
+          p12-password: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_PASSWORD }}
+
+      - name: Install gon via HomeBrew for code signing and app notarization
+        run: |
+          brew tap mitchellh/gon
+          brew install mitchellh/gon/gon
+      - name: Sign and Notarize CLI
+        run: |
+          echo ${{ secrets.GON_ZIP_CONFIG_BASE64 }} | base64 --decode > ./sign_macos.json
+          gon -log-level=info -log-json sign_macos.json
+          unzip sonar_quality_gate.zip
+          ls
+
       - name: Upload Unix Binary
         id: upload-release-asset-unix
         if: matrix.os == 'ubuntu-latest'
@@ -58,7 +75,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-            upload_url: ${{ needs.create_release.outputs.upload_url_github }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+            upload_url: ${{ needs.create_release.outputs.upload_url_github }}
             asset_path: target/release/sonar_qg
             asset_name: sonar-quality-gate-linux-x86_64
             asset_content_type: application/x-elf
@@ -71,7 +88,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-            upload_url: ${{ needs.create_release.outputs.upload_url_github }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+            upload_url: ${{ needs.create_release.outputs.upload_url_github }}
             asset_path: target/release/sonar_qg
             asset_name: sonar-quality-gate-darwin-x86_64
             asset_content_type: application/x-mach-binary
@@ -83,7 +100,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-            upload_url: ${{ needs.create_release.outputs.upload_url_github }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+            upload_url: ${{ needs.create_release.outputs.upload_url_github }}
             asset_path: target/release/sonar_qg.exe
             asset_name: sonar-quality-gate-windows-x86_64.exe
             asset_content_type: application/vnd.microsoft.portable-executable
