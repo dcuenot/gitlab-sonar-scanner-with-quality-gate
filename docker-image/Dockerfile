@@ -56,21 +56,21 @@ USER scanner-cli
 #         bash \
 #     && rm -rf /var/cache/apk/*
 
-# RUN addgroup -g ${GID} -S scanner-cli \
-#     && adduser -u ${UID} -S scanner-cli -G scanner-cli -s /bin/bash
+# RUN addgroup -g ${GID} -S docker-image \
+#     && adduser -u ${UID} -S docker-image -G docker-image -s /bin/bash
 
 # WORKDIR /opt
-# RUN wget -U "scannercli" -q -O /opt/sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip
+# RUN wget -U "scannercli" -q -O /opt/sonar-docker-image.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip
 
 # RUN unzip --help
 # RUN CF="${CF} -DNO_LCHMOD"
 # RUN CFLAGS="${CFLAGS} -DNO_LCHMOD"
-# RUN unzip -q sonar-scanner-cli.zip \
-#     && rm sonar-scanner-cli.zip \
+# RUN unzip -q sonar-docker-image.zip \
+#     && rm sonar-docker-image.zip \
 #     && mv sonar-scanner-${SONAR_SCANNER_VERSION}-linux ${SONAR_SCANNER_HOME}
 #
-#COPY --chown=scanner-cli:scanner-cli bin /usr/bin/
+#COPY --chown=docker-image:docker-image bin /usr/bin/
 #
 #WORKDIR /usr/src
 #
-#USER scanner-cli
+#USER docker-image
