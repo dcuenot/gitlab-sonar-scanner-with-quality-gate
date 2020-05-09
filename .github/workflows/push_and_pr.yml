@@ -94,11 +94,12 @@ jobs:
   build-docker-image:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - name: Publish to Registry
-        uses: elgohr/Publish-Docker-Github-Action@master
+      - uses: azure/docker-login@v1
         with:
-          name: dcuenot/sonar-scanner
+          login-server: index.docker.io
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          workdir: docker-image
+      - run: |
+          cd docker-image
+          docker build . -t dcuenot/sonar-scanner:${{ github.sha }}
+          docker push dcuenot/sonar-scanner:${{ github.sha }}
