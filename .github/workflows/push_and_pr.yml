@@ -100,6 +100,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - run: |
-          cd docker-image
+          ls
+          cd ./docker-image
           docker build . -t dcuenot/sonar-scanner:${{ github.sha }}
           docker push dcuenot/sonar-scanner:${{ github.sha }}
