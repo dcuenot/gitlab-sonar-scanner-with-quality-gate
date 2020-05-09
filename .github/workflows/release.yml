@@ -51,23 +51,6 @@ jobs:
           command: build
           args: --release --verbose
 
-      - name: Import Code-Signing Certificates
-        uses: apple-actions/import-codesign-certs@v1
-        with:
-          p12-file-base64: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_P12_BASE64 }}
-          p12-password: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_PASSWORD }}
-
-      - name: Install gon via HomeBrew for code signing and app notarization
-        run: |
-          brew tap mitchellh/gon
-          brew install mitchellh/gon/gon
-      - name: Sign and Notarize CLI
-        run: |
-          echo ${{ secrets.GON_ZIP_CONFIG_BASE64 }} | base64 --decode > ./sign_macos.json
-          gon -log-level=info -log-json sign_macos.json
-          unzip sonar_quality_gate.zip
-          ls
-
       - name: Upload Unix Binary
         id: upload-release-asset-unix
         if: matrix.os == 'ubuntu-latest'
@@ -79,19 +62,6 @@ jobs:
             asset_path: target/release/sonar_qg
             asset_name: sonar-quality-gate-linux-x86_64
             asset_content_type: application/x-elf
-      
-
-      - name: Upload MacOs Binary
-        id: upload-release-asset-macos
-        if: matrix.os == 'macos-latest'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-            upload_url: ${{ needs.create_release.outputs.upload_url_github }}
-            asset_path: target/release/sonar_qg
-            asset_name: sonar-quality-gate-darwin-x86_64
-            asset_content_type: application/x-mach-binary
             
       - name: Upload Windows Binary
         id: upload-release-asset-windows
@@ -104,3 +74,38 @@ jobs:
             asset_path: target/release/sonar_qg.exe
             asset_name: sonar-quality-gate-windows-x86_64.exe
             asset_content_type: application/vnd.microsoft.portable-executable
+
+
+      ### MacOS Specific
+
+      - name: Import Code-Signing Certificates
+        if: matrix.os == 'macos-latest'
+        uses: apple-actions/import-codesign-certs@v1
+        with:
+          p12-file-base64: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_P12_BASE64 }}
+          p12-password: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_PASSWORD }}
+
+      - name: Install gon via HomeBrew for code signing and app notarization
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew tap mitchellh/gon
+          brew install mitchellh/gon/gon
+      - name: Sign and Notarize CLI
+        if: matrix.os == 'macos-latest'
+        run: |
+          echo ${{ secrets.GON_ZIP_CONFIG_BASE64 }} | base64 --decode > ./sign_macos.json
+          gon -log-level=info -log-json sign_macos.json
+          unzip sonar_quality_gate.zip
+          ls
+
+      - name: Upload MacOs Binary
+        id: upload-release-asset-macos
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url_github }}
+          asset_path: target/release/sonar_qg
+          asset_name: sonar-quality-gate-darwin-x86_64
+          asset_content_type: application/x-mach-binary
