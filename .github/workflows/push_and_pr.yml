@@ -97,14 +97,10 @@ jobs:
       - uses: actions/checkout@v2
       - uses: azure/docker-login@v1
         with:
-          login-server: index.docker.io
           username: dcuenot
           password: ${{ secrets.DOCKER_PASSWORD }}
       - run: |
-          pwd
-          ls -al
-          ls -al ../
-      - run: |
           cd docker-image
-          docker build . -t index.docker.io/dcuenot/sonar-scanner:${{ github.sha }}
-          docker push index.docker.io/dcuenot/sonar-scanner:${{ github.sha }}
+          docker login
+          docker build . -t dcuenot/sonar-scanner:latest
+          docker push dcuenot/sonar-scanner:latest
