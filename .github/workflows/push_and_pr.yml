@@ -94,6 +94,7 @@ jobs:
   build-docker-image:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - uses: azure/docker-login@v1
         with:
           login-server: index.docker.io
@@ -104,6 +105,6 @@ jobs:
           ls -al
           ls -al ../
       - run: |
-          cd ../docker-image
+          cd docker-image
           docker build . -t dcuenot/sonar-scanner:${{ github.sha }}
           docker push dcuenot/sonar-scanner:${{ github.sha }}
