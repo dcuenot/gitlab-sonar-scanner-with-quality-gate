@@ -96,7 +96,6 @@ jobs:
           echo ${{ secrets.GON_ZIP_CONFIG_BASE64 }} | base64 --decode > ./sign_macos.json
           gon -log-level=info -log-json sign_macos.json
           unzip sonar_quality_gate.zip
-          ls
 
       - name: Upload MacOs Binary
         id: upload-release-asset-macos
@@ -106,6 +105,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url_github }}
-          asset_path: target/release/sonar_qg
+          asset_path: sonar_qg
           asset_name: sonar-quality-gate-darwin-x86_64
           asset_content_type: application/x-mach-binary
