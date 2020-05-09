@@ -102,7 +102,8 @@ jobs:
       - run: |
           pwd
           ls -al
+          ls -al ../
       - run: |
-          cd ./docker-image
+          cd ../docker-image
           docker build . -t dcuenot/sonar-scanner:${{ github.sha }}
           docker push dcuenot/sonar-scanner:${{ github.sha }}
