@@ -29,4 +29,4 @@ export SONAR_USER_HOME="$PROJECT_BASE_DIR/.sonar"
 
 echo "${args[@]}"
 
-#sonar-scanner "${args[@]}"
+sonar-scanner "${args[@]}"
