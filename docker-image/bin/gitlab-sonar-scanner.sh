@@ -10,23 +10,29 @@ add_env_var_as_env_prop() {
   fi
 }
 
-
-if [ -z "${SONAR_URL}" ]; then
-  echo "Undefined \"SONAR_URL\" env" && exit 1
-fi
-
-add_env_var_as_env_prop "${SONAR_URL}" "sonar.login"
-add_env_var_as_env_prop "${SONAR_LOGIN}" "sonar.login"
-add_env_var_as_env_prop "${SONAR_PASSWORD}" "sonar.password"
-add_env_var_as_env_prop "${SONAR_USER_HOME}" "sonar.userHome"
-add_env_var_as_env_prop "${SONAR_PROJECT_BASE_DIR}" "sonar.projectBaseDir"
-
 PROJECT_BASE_DIR="$PWD"
 if [ "${SONAR_PROJECT_BASE_DIR:-}" ]; then
   PROJECT_BASE_DIR="${SONAR_PROJECT_BASE_DIR}"
 fi
+
 export SONAR_USER_HOME="$PROJECT_BASE_DIR/.sonar"
 
-echo "${args[@]}"
+# if nothing is passed, assume we want to run sonar-scanner
+if [ "$#" == 0 ]; then
+  set -- sonar-scanner
+fi
 
-sonar-scanner "${args[@]}"
+# if first arg looks like a flag, assume we want to run sonar-scanner with flags
+if [ "${1#-}" != "${1}" ] || [ -z "$(command -v "${1}")" ]; then
+  set -- sonar-scanner "$@"
+fi
+
+if [[ "$1" = 'sonar-scanner' ]]; then
+  add_env_var_as_env_prop "${SONAR_LOGIN:-}" "sonar.login"
+  add_env_var_as_env_prop "${SONAR_PASSWORD:-}" "sonar.password"
+  add_env_var_as_env_prop "${SONAR_USER_HOME:-}" "sonar.userHome"
+  add_env_var_as_env_prop "${SONAR_PROJECT_BASE_DIR:-}" "sonar.projectBaseDir"
+  if [ ${#args[@]} -ne 0 ]; then
+    set -- sonar-scanner "${args[@]}" "${@:2}"
+  fi
+fi
