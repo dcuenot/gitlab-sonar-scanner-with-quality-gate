@@ -10,6 +10,7 @@ use anyhow::Error;
 use domain::sonar::QualityStatus;
 use infra::sonar_client::SonarClient;
 
+use crate::infra::gitlab_client::GitlabClient;
 use crate::infra::sonar_analysis_params::read_scanner_work::SonarAnalysisParams;
 use std::env;
 use tokio::runtime::Runtime;
@@ -31,11 +32,32 @@ pub fn process_quality_gate(
 
     let mut rt = Runtime::new().expect("tokio runtime can be initialized");
     rt.block_on(async move {
-        sonar_client
+        let quality_status = sonar_client
             .clone()
             .quality_gate_status(&task.analysis_id)
-            .await
+            .await?;
 
-        // TODO: Add if gitlab private token and in merge request => push to gitlab comments
+        println!("Yolo");
+        let gitlab_client = GitlabClient::new(
+            "https://gitlab.thalesdigital.io",
+            "Znh4mrUPYBr-6fMMJpSc",
+            12737,
+        );
+
+        println!("Yolo");
+        let opened_mr = gitlab_client
+            .clone()
+            .list_opened_merge_requests("test")
+            .await?;
+        println!("{:?}", &opened_mr);
+
+        println!("Yolo");
+        gitlab_client
+            .write_quality_gate_report(opened_mr[0].iid, quality_status.clone())
+            .await;
+        // TODO: Add if gitlab_client private token and in merge request => push to gitlab_client comments
+
+        println!("Yolo");
+        Ok(quality_status)
     })
 }

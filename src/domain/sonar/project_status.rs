@@ -1,7 +1,7 @@
 use super::condition::Condition;
 use super::period::Period;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ProjectStatus {
     pub status: String,
     pub conditions: Vec<Condition>,

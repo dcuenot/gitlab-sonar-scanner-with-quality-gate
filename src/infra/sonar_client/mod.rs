@@ -15,14 +15,14 @@ pub(crate) struct SonarClient {
 }
 
 impl SonarClient {
-    pub fn new(url: &str, token: &str) -> SonarClient {
-        SonarClient {
+    pub fn new(url: &str, token: &str) -> Self {
+        Self {
             url: url.into(),
             token: token.into(),
         }
     }
 
-    pub async fn quality_gate_status(self, analysis_id: &str) -> Result<QualityStatus, Error> {
+    pub async fn quality_gate_status(self, analysis_id: &str) -> anyhow::Result<QualityStatus> {
         let request_builder = reqwest::Client::new()
             .get(&format!("{}/api/qualitygates/project_status", self.url))
             .query(&[("analysisId", analysis_id)])
@@ -31,7 +31,7 @@ impl SonarClient {
         send_request::<QualityStatus>(request_builder).await
     }
 
-    pub fn analysis_id(&self, task_id: &str) -> Result<SonarBackgroundTask> {
+    pub fn analysis_id(&self, task_id: &str) -> anyhow::Result<SonarBackgroundTask> {
         let now = Instant::now();
 
         let result = retry_with_index(Fibonacci::from_millis(1000), |current_try| {

@@ -10,7 +10,7 @@ const LINE_ENDING: &str = "\r\n";
 #[cfg(not(windows))]
 const LINE_ENDING: &str = "\n";
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct QualityStatus {
     #[serde(rename = "projectStatus")]
     pub project_status: ProjectStatus,

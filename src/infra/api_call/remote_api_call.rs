@@ -5,6 +5,7 @@ pub async fn send_request<T: DeserializeOwned>(
     request_builder: RequestBuilder,
 ) -> anyhow::Result<T> {
     let response = request_builder.send().await?;
+    println!("---- {:?}", &response);
 
     if !response.status().is_success() {
         return Err(anyhow!(
