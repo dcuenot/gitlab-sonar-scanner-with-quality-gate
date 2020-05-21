@@ -7,10 +7,10 @@
 
 # CLI description
 ```
-Sonar Quality Gate CLI 0.1.0
+Sonar Quality Gate CLI 1.0.0
 
 USAGE:
-    sonar_qg [FLAGS] [OPTIONS] --sonar_analysis_id <sonar-analysis-id> --sonar_token <sonar-token> --sonar_url <sonar-url>
+    sonar_qg [FLAGS] [OPTIONS] [report-task-path]
 
 FLAGS:
     -h, --help       Prints help information
@@ -19,9 +19,10 @@ FLAGS:
 
 OPTIONS:
     -g, --gitlab_private_token <gitlab-private-token>     [env: GITLAB_PRIVATE_TOKEN=]
-    -i, --sonar_analysis_id <sonar-analysis-id>          
-    -t, --sonar_token <sonar-token>                       [env: SONAR_TOKEN=]
-    -u, --sonar_url <sonar-url>                           [env: SONAR_URL=]
+
+ARGS:
+    <report-task-path>     [default: .scannerwork/report-task.txt]
+
 ```
 
 # Sample of output
