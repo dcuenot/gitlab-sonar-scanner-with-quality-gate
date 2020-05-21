@@ -1,6 +1,6 @@
 projectKey=my-awesome-project
-serverUrl=https://sonar.com/sonar
+serverUrl=https://quality-analysis.thalesdigital.io/sonar
 serverVersion=7.9.1.27448
 dashboardUrl=https://sonar.com/sonar/dashboard?id=my-awesome-project
-ceTaskId=AXIxuGnQQLkOZHj6WkoG
+ceTaskId=AXI3XEDHQLkOZHj6Wkuc
 ceTaskUrl=https://sonar.com/sonar/api/ce/task?id=AXIxuGnQQLkOZHj6WkoG

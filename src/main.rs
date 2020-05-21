@@ -27,6 +27,7 @@ struct Options {
 
 fn main() {
     let options = Options::from_args();
+    println!("{}", options.verbose);
 
     match process_quality_gate(options.report_task_path, options.gitlab_private_token) {
         Ok(result) => {
