@@ -1,11 +1,11 @@
 use std::time::Instant;
 
 use anyhow::{Error, Result};
-use retry::{OperationResult, retry_with_index};
 use retry::delay::Fibonacci;
+use retry::{retry_with_index, OperationResult};
 
-use crate::domain::sonar::QualityStatus;
 use crate::domain::sonar::task::{SonarBackgroundTask, Task};
+use crate::domain::sonar::QualityStatus;
 use crate::infra::api_call::remote_api_call::{send_request, send_request_blocking};
 
 #[derive(Clone)]
@@ -74,8 +74,8 @@ impl SonarClient {
 mod tests {
     use std::time::Instant;
 
-    use retry::{OperationResult, retry_with_index};
-    use retry::delay::{Fibonacci};
+    use retry::delay::Fibonacci;
+    use retry::{retry_with_index, OperationResult};
 
     #[test]
     fn test_retry_mechanism() {
