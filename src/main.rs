@@ -1,19 +1,16 @@
 extern crate sonar_qg;
 
-use sonar_qg::yolo;
+use std::path::PathBuf;
+
 use structopt::StructOpt;
+
+use sonar_qg::process_quality_gate;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "Sonar Quality Gate CLI")]
 struct Options {
-    #[structopt(short = "u", long = "sonar_url", env = "SONAR_URL")]
-    sonar_url: String,
-
-    #[structopt(short = "t", long = "sonar_token", env = "SONAR_TOKEN")]
-    sonar_token: String,
-
-    #[structopt(short = "i", long = "sonar_analysis_id")]
-    sonar_analysis_id: String,
+    #[structopt(default_value = ".scannerwork/report-task.txt", parse(from_os_str))]
+    report_task_path: PathBuf,
 
     #[structopt(
         short = "g",
@@ -31,12 +28,7 @@ struct Options {
 fn main() {
     let options = Options::from_args();
 
-    match yolo(
-        options.sonar_url,
-        options.sonar_token,
-        options.sonar_analysis_id,
-        options.gitlab_private_token,
-    ) {
+    match process_quality_gate(options.report_task_path, options.gitlab_private_token) {
         Ok(result) => {
             // println!("{:#?}", &result);
             println!("{}", result.display());

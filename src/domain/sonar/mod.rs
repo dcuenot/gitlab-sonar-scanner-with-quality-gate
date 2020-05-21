@@ -3,6 +3,7 @@ use project_status::ProjectStatus;
 mod condition;
 mod period;
 mod project_status;
+pub mod task;
 
 #[cfg(windows)]
 const LINE_ENDING: &str = "\r\n";
