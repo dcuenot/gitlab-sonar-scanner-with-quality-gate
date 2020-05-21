@@ -25,6 +25,7 @@ pub fn process_quality_gate(
 
     let sonar_token = env::var("SONAR_TOKEN").expect("Env variable SONAR_TOKEN is missing");
 
+    // TODO: Define Trait for Sonar Client
     let sonar_client = SonarClient::new(&params.server_url, &sonar_token);
     let task = sonar_client.clone().analysis_id(&params.ce_task_id)?;
 
@@ -34,5 +35,7 @@ pub fn process_quality_gate(
             .clone()
             .quality_gate_status(&task.analysis_id)
             .await
+
+        // TODO: Add if gitlab private token and in merge request => push to gitlab comments
     })
 }
