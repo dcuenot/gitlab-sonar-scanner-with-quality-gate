@@ -3,9 +3,7 @@ use crate::domain::gitlab::note::Note;
 use crate::domain::sonar::QualityStatus;
 use crate::infra::api_call::remote_api_call::send;
 use log::*;
-use reqwest::header;
 use reqwest::header::HeaderValue;
-use std::env;
 
 #[derive(Clone)]
 pub(crate) struct GitlabClient {
@@ -69,22 +67,5 @@ impl GitlabClient {
             HeaderValue::from_str(&self.token).expect("Issue during HeaderValue creation");
         token.set_sensitive(true);
         token
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use tokio::runtime::Runtime;
-
-    #[test]
-    fn plop() {
-        let gitlab_client = GitlabClient::new("", "", "");
-
-        let mut rt = Runtime::new().expect("tokio runtime can be initialized");
-        let res =
-            rt.block_on(async move { gitlab_client.list_opened_merge_requests("test").await });
-
-        print!("{:?}", res);
     }
 }

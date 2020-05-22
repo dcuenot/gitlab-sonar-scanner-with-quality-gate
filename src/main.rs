@@ -8,7 +8,7 @@ use std::path::PathBuf;
 
 use structopt::StructOpt;
 
-use simplelog::{Config, ConfigBuilder, LevelFilter, TermLogger, TerminalMode};
+use simplelog::{ConfigBuilder, LevelFilter, TermLogger, TerminalMode};
 use sonar_qg::process_quality_gate;
 
 #[derive(StructOpt, Debug)]
