@@ -26,8 +26,12 @@ impl GitlabClient {
         ci_commit_ref_name: &str,
     ) -> anyhow::Result<MergeRequests> {
         let request = reqwest::Client::new()
-            .get(&format!("{}/api/v4/merge_requests",self.url))
-            .query(&[("source_branch", ci_commit_ref_name), ("state", "opened"), ("source_project_id", &self.ci_project_id.to_string())])
+            .get(&format!("{}/api/v4/merge_requests", self.url))
+            .query(&[
+                ("source_branch", ci_commit_ref_name),
+                ("state", "opened"),
+                ("source_project_id", &self.ci_project_id.to_string()),
+            ])
             .header("PRIVATE-TOKEN", self.header_authorization())
             .build()?;
 
@@ -42,8 +46,7 @@ impl GitlabClient {
         ci_merge_request_iid: i64,
         qualtiy_status: QualityStatus,
     ) -> anyhow::Result<()> {
-        let note =
-            Note::from_quality_status(qualtiy_status, project_id, ci_merge_request_iid);
+        let note = Note::from_quality_status(qualtiy_status, project_id, ci_merge_request_iid);
         let request = reqwest::Client::new()
             .post(&format!(
                 "{}/api/v4/projects/{}/merge_requests/{}/notes",

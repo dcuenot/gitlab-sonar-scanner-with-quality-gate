@@ -45,17 +45,26 @@ pub fn process_quality_gate(
         if let Some(private_token) = gitlab_private_token {
             let hint = "It seems this script is not running in a Gitlab pipeline";
             if env::var(ENV_NAME_GITLAB_URL).is_err() {
-                bail!("Environment variable {} is missing. {}", ENV_NAME_GITLAB_URL, hint);
+                bail!(
+                    "Environment variable {} is missing. {}",
+                    ENV_NAME_GITLAB_URL,
+                    hint
+                );
             }
             if env::var(ENV_NAME_GITLAB_PROJECT_ID).is_err() {
-                bail!("Environment variable {} is missing. {}", ENV_NAME_GITLAB_PROJECT_ID, hint);
+                bail!(
+                    "Environment variable {} is missing. {}",
+                    ENV_NAME_GITLAB_PROJECT_ID,
+                    hint
+                );
             }
-
 
             let gitlab_client = GitlabClient::new(
                 &env::var(ENV_NAME_GITLAB_URL).unwrap(),
                 &private_token,
-                env::var(ENV_NAME_GITLAB_PROJECT_ID).unwrap().parse::<i64>()?,
+                env::var(ENV_NAME_GITLAB_PROJECT_ID)
+                    .unwrap()
+                    .parse::<i64>()?,
             );
 
             let opened_mr = gitlab_client
