@@ -2,10 +2,10 @@ use crate::domain::gitlab::merge_requests::MergeRequests;
 use crate::domain::gitlab::note::Note;
 use crate::domain::sonar::QualityStatus;
 use crate::infra::api_call::remote_api_call::send;
-use reqwest::header;
-use std::env;
 use log::*;
+use reqwest::header;
 use reqwest::header::HeaderValue;
+use std::env;
 
 #[derive(Clone)]
 pub(crate) struct GitlabClient {
@@ -46,11 +46,8 @@ impl GitlabClient {
         ci_merge_request_iid: i64,
         qualtiy_status: QualityStatus,
     ) -> anyhow::Result<()> {
-        let note = Note::from_quality_status(
-            qualtiy_status,
-            self.ci_project_id,
-            ci_merge_request_iid,
-        );
+        let note =
+            Note::from_quality_status(qualtiy_status, self.ci_project_id, ci_merge_request_iid);
         let request = reqwest::Client::new()
             .post(&format!(
                 "{}/api/v4/projects/{}/merge_requests/{}/notes",
@@ -68,8 +65,8 @@ impl GitlabClient {
     // Dirty workaround could be removed once PR will be validated
     // https://github.com/seanmonstar/reqwest/pull/916
     fn header_authorization(&self) -> HeaderValue {
-        let mut token = HeaderValue::from_str(&self.token)
-            .expect("Issue during HeaderValue creation");
+        let mut token =
+            HeaderValue::from_str(&self.token).expect("Issue during HeaderValue creation");
         token.set_sensitive(true);
         token
     }

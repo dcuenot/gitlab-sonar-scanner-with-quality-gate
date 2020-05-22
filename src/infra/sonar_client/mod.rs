@@ -58,19 +58,11 @@ impl SonarClient {
             match self.get_task(&task_id) {
                 Ok(t) if t.status == "SUCCESS" => OperationResult::Ok(t),
                 Ok(t) => {
-                    error!(
-                        "{}. {}",
-                        current_try,
-                        t.status
-                    );
+                    error!("{}. {}", current_try, t.status);
                     OperationResult::Retry("Incorrect status")
                 }
                 Err(e) => {
-                    error!(
-                        "{}. {}",
-                        current_try,
-                        e
-                    );
+                    error!("{}. {}", current_try, e);
                     OperationResult::Retry("Error during API call")
                 }
             }
