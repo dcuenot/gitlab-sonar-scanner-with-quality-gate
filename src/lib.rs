@@ -3,7 +3,6 @@ extern crate serde_derive;
 #[macro_use]
 extern crate anyhow;
 
-use log::*;
 use std::path::PathBuf;
 
 use anyhow::Error;
@@ -56,7 +55,7 @@ pub fn process_quality_gate(
 
         gitlab_client
             .write_quality_gate_report(opened_mr[0].iid, quality_status.clone())
-            .await;
+            .await?;
         // TODO: Add if gitlab_client private token and in merge request => push to gitlab_client comments
 
         Ok(quality_status)

@@ -1,9 +1,6 @@
 use log::*;
-use reqwest::header::HeaderName;
 use reqwest::Request;
-use reqwest::RequestBuilder;
 use serde::de::DeserializeOwned;
-use std::collections::HashMap;
 
 pub async fn send<T: DeserializeOwned>(request: Request) -> anyhow::Result<T> {
     trace!("{:?}", request);

@@ -1,5 +1,4 @@
 use crate::domain::sonar::QualityStatus;
-use std::error::Error;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Note {

@@ -1,6 +1,3 @@
-use std::time::Instant;
-
-use anyhow::{Error, Result};
 use log::*;
 use reqwest::Request;
 use retry::delay::Fibonacci;
