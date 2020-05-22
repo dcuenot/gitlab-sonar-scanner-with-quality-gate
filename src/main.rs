@@ -53,7 +53,7 @@ fn config_logger(verbose: u8) {
     let config = ConfigBuilder::new()
         .set_time_format_str("%Y-%m-%dT%H:%M:%SZ")
         .set_target_level(LevelFilter::Off)
-        .set_location_level(LevelFilter::Debug)
+        .set_location_level(LevelFilter::Error)
         .add_filter_allow_str("sonar_qg")
         .build();
     TermLogger::init(log_level, config, TerminalMode::Mixed).unwrap();

@@ -5,8 +5,6 @@ extern crate anyhow;
 
 use std::path::PathBuf;
 
-use anyhow::Error;
-
 use domain::sonar::QualityStatus;
 use infra::sonar_client::SonarClient;
 
@@ -19,11 +17,13 @@ pub mod domain;
 pub mod infra;
 
 const ENV_NAME_SONAR_TOKEN: &str = "SONAR_TOKEN";
+const ENV_NAME_GITLAB_URL: &str = "CI_SERVER_URL";
+const ENV_NAME_GITLAB_PROJECT_ID: &str = "CI_PROJECT_ID";
 
 pub fn process_quality_gate(
     report_task_path: PathBuf,
-    _gitlab_private_token: Option<String>,
-) -> Result<QualityStatus, Error> {
+    gitlab_private_token: Option<String>,
+) -> anyhow::Result<QualityStatus> {
     let params = SonarAnalysisParams::from_report_task(report_task_path);
 
     if env::var(ENV_NAME_SONAR_TOKEN).is_err() {
@@ -42,21 +42,34 @@ pub fn process_quality_gate(
             .quality_gate_status(&task.analysis_id)
             .await?;
 
-        let gitlab_client = GitlabClient::new(
-            &env::var("GITLAB_URL").ok().unwrap(),
-            &env::var("GITLAB_PRIVATE_TOKEN").ok().unwrap(),
-            12737,
-        );
+        if let Some(private_token) = gitlab_private_token {
+            let hint = "It seems this script is not running in a Gitlab pipeline";
+            if env::var(ENV_NAME_GITLAB_URL).is_err() {
+                bail!("Environment variable {} is missing. {}", ENV_NAME_GITLAB_URL, hint);
+            }
+            if env::var(ENV_NAME_GITLAB_PROJECT_ID).is_err() {
+                bail!("Environment variable {} is missing. {}", ENV_NAME_GITLAB_PROJECT_ID, hint);
+            }
 
-        let opened_mr = gitlab_client
-            .clone()
-            .list_opened_merge_requests("test")
-            .await?;
 
-        gitlab_client
-            .write_quality_gate_report(opened_mr[0].iid, quality_status.clone())
-            .await?;
-        // TODO: Add if gitlab_client private token and in merge request => push to gitlab_client comments
+            let gitlab_client = GitlabClient::new(
+                &env::var(ENV_NAME_GITLAB_URL).unwrap(),
+                &private_token,
+                env::var(ENV_NAME_GITLAB_PROJECT_ID).unwrap().parse::<i64>()?,
+            );
+
+            let opened_mr = gitlab_client
+                .clone()
+                .list_opened_merge_requests("test")
+                .await?;
+
+            for mr in opened_mr.into_iter() {
+                gitlab_client
+                    .clone()
+                    .write_quality_gate_report(mr.project_id, mr.iid, quality_status.clone())
+                    .await?;
+            }
+        }
 
         Ok(quality_status)
     })
