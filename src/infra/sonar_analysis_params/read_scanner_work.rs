@@ -1,3 +1,4 @@
+use log::*;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
@@ -36,14 +37,17 @@ impl SonarAnalysisParams {
     pub fn from_report_task(report_task_path: PathBuf) -> Self {
         let props = Self::read_file(&report_task_path);
 
-        Self {
+        let sonar_analysis_params = Self {
             project_key: props.get("projectKey").unwrap().into(),
             server_url: props.get("serverUrl").unwrap().into(),
             server_version: props.get("serverVersion").unwrap().into(),
             dashboard_url: props.get("dashboardUrl").unwrap().into(),
             ce_task_id: props.get("ceTaskId").unwrap().into(),
             ce_task_url: props.get("ceTaskUrl").unwrap().into(),
-        }
+        };
+
+        debug!("{:?}", sonar_analysis_params);
+        sonar_analysis_params
     }
 
     ///

@@ -1,9 +1,11 @@
 use crate::domain::gitlab::merge_requests::MergeRequests;
 use crate::domain::gitlab::note::Note;
 use crate::domain::sonar::QualityStatus;
-use crate::infra::api_call::remote_api_call::send_request;
+use crate::infra::api_call::remote_api_call::send;
 use reqwest::header;
 use std::env;
+use log::*;
+use reqwest::header::HeaderValue;
 
 #[derive(Clone)]
 pub(crate) struct GitlabClient {
@@ -25,15 +27,18 @@ impl GitlabClient {
         self,
         ci_commit_ref_name: &str,
     ) -> anyhow::Result<MergeRequests> {
-        let request_builder = reqwest::Client::new()
+        let request = reqwest::Client::new()
             .get(&format!(
                 "{}/api/v4/projects/{}/merge_requests",
                 self.url, self.ci_project_id
             ))
             .query(&[("source_branch", ci_commit_ref_name), ("state", "opened")])
-            .header("PRIVATE-TOKEN", self.token);
+            .header("PRIVATE-TOKEN", self.header_authorization())
+            .build()?;
 
-        send_request::<MergeRequests>(request_builder).await
+        let res = send::<MergeRequests>(request).await?;
+        debug!("{:?}", res);
+        Ok(res)
     }
 
     pub async fn write_quality_gate_report(
@@ -41,19 +46,32 @@ impl GitlabClient {
         ci_merge_request_iid: i64,
         qualtiy_status: QualityStatus,
     ) -> anyhow::Result<()> {
-        let request_builder = reqwest::Client::new()
+        let note = Note::from_quality_status(
+            qualtiy_status,
+            self.ci_project_id,
+            ci_merge_request_iid,
+        );
+        let request = reqwest::Client::new()
             .post(&format!(
                 "{}/api/v4/projects/{}/merge_requests/{}/notes",
                 self.url, self.ci_project_id, ci_merge_request_iid
             ))
-            .json(&Note::from_quality_status(
-                qualtiy_status,
-                self.ci_project_id,
-                ci_merge_request_iid,
-            ))
-            .header("PRIVATE-TOKEN", self.token);
+            .json(&note)
+            .header("PRIVATE-TOKEN", self.header_authorization())
+            .build()?;
 
-        send_request(request_builder).await
+        let res = send(request).await;
+        debug!("Note successfully written in Gitlab: {:?}", note);
+        res
+    }
+
+    // Dirty workaround could be removed once PR will be validated
+    // https://github.com/seanmonstar/reqwest/pull/916
+    fn header_authorization(&self) -> HeaderValue {
+        let mut token = HeaderValue::from_str(&self.token)
+            .expect("Issue during HeaderValue creation");
+        token.set_sensitive(true);
+        token
     }
 }
 

@@ -1,11 +1,15 @@
+use log::*;
+use reqwest::header::HeaderName;
+use reqwest::Request;
 use reqwest::RequestBuilder;
 use serde::de::DeserializeOwned;
+use std::collections::HashMap;
 
-pub async fn send_request<T: DeserializeOwned>(
-    request_builder: RequestBuilder,
-) -> anyhow::Result<T> {
-    let response = request_builder.send().await?;
-    println!("---- {:?}", &response);
+pub async fn send<T: DeserializeOwned>(request: Request) -> anyhow::Result<T> {
+
+    trace!("{:?}", request);
+    let response = reqwest::Client::new().execute(request).await?;
+    trace!("{:?}", &response);
 
     if !response.status().is_success() {
         return Err(anyhow!(
