@@ -26,11 +26,8 @@ impl GitlabClient {
         ci_commit_ref_name: &str,
     ) -> anyhow::Result<MergeRequests> {
         let request = reqwest::Client::new()
-            .get(&format!(
-                "{}/api/v4/projects/{}/merge_requests",
-                self.url, self.ci_project_id
-            ))
-            .query(&[("source_branch", ci_commit_ref_name), ("state", "opened")])
+            .get(&format!("{}/api/v4/merge_requests",self.url))
+            .query(&[("source_branch", ci_commit_ref_name), ("state", "opened"), ("source_project_id", &self.ci_project_id.to_string())])
             .header("PRIVATE-TOKEN", self.header_authorization())
             .build()?;
 
@@ -41,23 +38,24 @@ impl GitlabClient {
 
     pub async fn write_quality_gate_report(
         self,
+        project_id: i64,
         ci_merge_request_iid: i64,
         qualtiy_status: QualityStatus,
     ) -> anyhow::Result<()> {
         let note =
-            Note::from_quality_status(qualtiy_status, self.ci_project_id, ci_merge_request_iid);
+            Note::from_quality_status(qualtiy_status, project_id, ci_merge_request_iid);
         let request = reqwest::Client::new()
             .post(&format!(
                 "{}/api/v4/projects/{}/merge_requests/{}/notes",
-                self.url, self.ci_project_id, ci_merge_request_iid
+                self.url, project_id, ci_merge_request_iid
             ))
             .json(&note)
             .header("PRIVATE-TOKEN", self.header_authorization())
             .build()?;
 
-        let res = send(request).await;
+        let _res = send::<()>(request).await;
         debug!("Note successfully written in Gitlab: {:?}", note);
-        res
+        Ok(())
     }
 
     // Dirty workaround could be removed once PR will be validated
