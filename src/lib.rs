@@ -3,6 +3,7 @@ extern crate serde_derive;
 #[macro_use]
 extern crate anyhow;
 
+use log::*;
 use std::path::PathBuf;
 
 use anyhow::Error;
@@ -18,13 +19,18 @@ use tokio::runtime::Runtime;
 pub mod domain;
 pub mod infra;
 
+const ENV_NAME_SONAR_TOKEN: &str = "SONAR_TOKEN";
+
 pub fn process_quality_gate(
     report_task_path: PathBuf,
     _gitlab_private_token: Option<String>,
 ) -> Result<QualityStatus, Error> {
     let params = SonarAnalysisParams::from_report_task(report_task_path);
 
-    let sonar_token = env::var("SONAR_TOKEN").expect("Env variable SONAR_TOKEN is missing");
+    if env::var(ENV_NAME_SONAR_TOKEN).is_err() {
+        bail!("Environment variable {} is missing", ENV_NAME_SONAR_TOKEN);
+    }
+    let sonar_token = env::var(ENV_NAME_SONAR_TOKEN).unwrap();
 
     // TODO: Define Trait for Sonar Client
     let sonar_client = SonarClient::new(&params.server_url, &sonar_token);
@@ -37,27 +43,22 @@ pub fn process_quality_gate(
             .quality_gate_status(&task.analysis_id)
             .await?;
 
-        println!("Yolo");
         let gitlab_client = GitlabClient::new(
-            "https://gitlab.thalesdigital.io",
-            "Znh4mrUPYBr-6fMMJpSc",
+            &env::var("GITLAB_URL").ok().unwrap(),
+            &env::var("GITLAB_PRIVATE_TOKEN").ok().unwrap(),
             12737,
         );
 
-        println!("Yolo");
         let opened_mr = gitlab_client
             .clone()
             .list_opened_merge_requests("test")
             .await?;
-        println!("{:?}", &opened_mr);
 
-        println!("Yolo");
         gitlab_client
             .write_quality_gate_report(opened_mr[0].iid, quality_status.clone())
             .await;
         // TODO: Add if gitlab_client private token and in merge request => push to gitlab_client comments
 
-        println!("Yolo");
         Ok(quality_status)
     })
 }

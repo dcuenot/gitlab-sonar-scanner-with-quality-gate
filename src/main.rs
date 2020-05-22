@@ -1,9 +1,14 @@
+#[macro_use]
+extern crate log;
+extern crate simplelog;
+
 extern crate sonar_qg;
 
 use std::path::PathBuf;
 
 use structopt::StructOpt;
 
+use simplelog::{Config, ConfigBuilder, LevelFilter, TermLogger, TerminalMode};
 use sonar_qg::process_quality_gate;
 
 #[derive(StructOpt, Debug)]
@@ -27,13 +32,29 @@ struct Options {
 
 fn main() {
     let options = Options::from_args();
-    println!("{}", options.verbose);
+    config_logger(options.verbose);
 
     match process_quality_gate(options.report_task_path, options.gitlab_private_token) {
         Ok(result) => {
-            // println!("{:#?}", &result);
             println!("{}", result.display());
         }
-        Err(e) => println!("MY Error: {:#?}", e),
+        Err(e) => error!("Error: {:#?}", e),
     };
+}
+
+fn config_logger(verbose: u8) {
+    let log_level = match verbose {
+        0 => LevelFilter::Warn,
+        1 => LevelFilter::Info,
+        2 => LevelFilter::Debug,
+        _ => LevelFilter::Trace,
+    };
+
+    let config = ConfigBuilder::new()
+        .set_time_format_str("%Y-%m-%dT%H:%M:%SZ")
+        .set_target_level(LevelFilter::Off)
+        .set_location_level(LevelFilter::Debug)
+        .add_filter_allow_str("sonar_qg")
+        .build();
+    TermLogger::init(log_level, config, TerminalMode::Mixed).unwrap();
 }

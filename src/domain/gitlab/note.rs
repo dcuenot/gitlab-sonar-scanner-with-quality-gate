@@ -18,7 +18,7 @@ impl Note {
         Self {
             id: project_id,
             merge_request_iid,
-            body: quality_status.display().replace("\n", "<br />\n"),
+            body: quality_status.display().replace("\n", "<br />"),
             system: true,
         }
     }
