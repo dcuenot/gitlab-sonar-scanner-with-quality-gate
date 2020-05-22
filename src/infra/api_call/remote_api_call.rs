@@ -6,7 +6,6 @@ use serde::de::DeserializeOwned;
 use std::collections::HashMap;
 
 pub async fn send<T: DeserializeOwned>(request: Request) -> anyhow::Result<T> {
-
     trace!("{:?}", request);
     let response = reqwest::Client::new().execute(request).await?;
     trace!("{:?}", &response);
