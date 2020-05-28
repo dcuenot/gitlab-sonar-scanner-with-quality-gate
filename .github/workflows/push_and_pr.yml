@@ -105,7 +105,9 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - run: |
           cd ..
-          sudo apt-get install libssl-dev
+          sudo apt-get install pkg-config libssl-dev
+          pkg-config --libs openssl
+          pkg-config --cflags openssl
           docker login
           docker build . -t dcuenot/sonar-scanner:latest
           docker push dcuenot/sonar-scanner:latest
