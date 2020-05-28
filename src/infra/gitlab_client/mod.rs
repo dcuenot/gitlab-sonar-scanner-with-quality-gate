@@ -34,7 +34,9 @@ impl GitlabClient {
             .header("PRIVATE-TOKEN", self.header_authorization())
             .build()?;
 
-        let res = ApiCallRemoteAdapter{}.send::<MergeRequests>(request).await?;
+        let res = ApiCallRemoteAdapter {}
+            .send::<MergeRequests>(request)
+            .await?;
         debug!("{:?}", res);
         Ok(res)
     }
@@ -55,7 +57,7 @@ impl GitlabClient {
             .header("PRIVATE-TOKEN", self.header_authorization())
             .build()?;
 
-        let _res = ApiCallRemoteAdapter{}.send::<()>(request).await;
+        let _res = ApiCallRemoteAdapter {}.send::<()>(request).await;
         debug!("Note successfully written in Gitlab: {:?}", note);
         Ok(())
     }

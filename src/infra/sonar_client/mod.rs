@@ -15,7 +15,7 @@ use tokio::runtime::Runtime;
 #[derive(Clone)]
 pub(crate) struct SonarClient {
     url: String,
-    token: String
+    token: String,
 }
 
 impl fmt::Debug for SonarClient {
@@ -44,7 +44,9 @@ impl SonarClient {
             .header(reqwest::header::AUTHORIZATION, self.header_authorization())
             .build()?;
 
-        ApiCallRemoteAdapter{}.send::<QualityStatus>(request_builder).await
+        ApiCallRemoteAdapter {}
+            .send::<QualityStatus>(request_builder)
+            .await
     }
 
     // Cannot be async, because async closures are unstable and closure is mandatory for retry_with_index
@@ -82,7 +84,7 @@ impl SonarClient {
             .build()?;
 
         let mut rt = Runtime::new().expect("tokio runtime can be initialized");
-        let res = rt.block_on(ApiCallRemoteAdapter{}.send::<Task>(request))?;
+        let res = rt.block_on(ApiCallRemoteAdapter {}.send::<Task>(request))?;
         debug!("{:?}", res.task);
         Ok(res.task)
     }
