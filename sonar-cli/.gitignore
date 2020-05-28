@@ -1,4 +1,7 @@
 # Project Specific .gitignore
+/proptest-regressions
+sign_macos.json
+test-report-tasks-2.txt
 
 # End of project Specific
 
@@ -14,7 +17,7 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff
-.idea/
+../.idea/
 *.iml
 *.ipr
 

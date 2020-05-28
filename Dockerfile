@@ -1,3 +1,19 @@
+# Build Stage
+FROM rust:1-slim AS builder
+WORKDIR /usr/src/
+RUN rustup target add x86_64-unknown-linux-musl
+
+RUN USER=root cargo new sonar-cli
+WORKDIR /usr/src/sonar-cli
+COPY sonar-cli/Cargo.toml ./
+COPY sonar-cli/Cargo.lock ./
+RUN cargo build --release
+
+COPY sonar-cli/src ./src
+RUN cargo install --target x86_64-unknown-linux-musl --path .
+
+
+# Bundle Stage
 FROM openjdk:11-jre-slim
 
 ARG SONAR_SCANNER_HOME=/opt/sonar-scanner
@@ -36,41 +52,7 @@ RUN tar Jxf nodejs.tar.xz \
     && mv node-${NODEJS_VERSION}-linux-x64 ${NODEJS_HOME} \
     && npm install -g typescript@3.8.3
 
+COPY --from=builder --chown=scanner-cli:scanner-cli /usr/local/cargo/bin/sonar-cli /usr/bin/
+
 WORKDIR /usr/src
 USER scanner-cli
-
-# FROM alpine:edge
-# # unzip issue with 3.11 : https://gitlab.alpinelinux.org/alpine/aports/issues/11221
-
-# ARG SONAR_SCANNER_HOME=/opt/sonar-scanner
-# ARG UID=1000
-# ARG GID=1000
-
-# ENV SONAR_SCANNER_HOME=${SONAR_SCANNER_HOME} \
-#     SONAR_SCANNER_VERSION=4.2.0.1873 \
-#     PATH=${SONAR_SCANNER_HOME}/bin:${PATH}
-
-# RUN apk add --update \
-#         wget \
-#         git \
-#         bash \
-#     && rm -rf /var/cache/apk/*
-
-# RUN addgroup -g ${GID} -S docker-image \
-#     && adduser -u ${UID} -S docker-image -G docker-image -s /bin/bash
-
-# WORKDIR /opt
-# RUN wget -U "scannercli" -q -O /opt/sonar-docker-image.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip
-
-# RUN unzip --help
-# RUN CF="${CF} -DNO_LCHMOD"
-# RUN CFLAGS="${CFLAGS} -DNO_LCHMOD"
-# RUN unzip -q sonar-docker-image.zip \
-#     && rm sonar-docker-image.zip \
-#     && mv sonar-scanner-${SONAR_SCANNER_VERSION}-linux ${SONAR_SCANNER_HOME}
-#
-#COPY --chown=docker-image:docker-image bin /usr/bin/
-#
-#WORKDIR /usr/src
-#
-#USER docker-image

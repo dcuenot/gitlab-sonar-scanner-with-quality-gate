@@ -1,0 +1,5 @@
+sonar-cli/target/*
+sonar-cli/proptest-regresssions/*
+.idea
+.github
+.git
