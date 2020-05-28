@@ -1,20 +1,21 @@
-use log::*;
 use reqwest::Request;
-use retry::delay::Fibonacci;
 use retry::{retry_with_index, OperationResult};
 
 use crate::domain::sonar::task::{SonarBackgroundTask, Task};
 use crate::domain::sonar::QualityStatus;
-use crate::infra::api_call::remote_api_call::{send, send_request_blocking};
+use crate::infra::api_call_remote::ApiCallRemoteAdapter;
 use base64::write::EncoderWriter as Base64Encoder;
 use core::fmt;
 use reqwest::header::HeaderValue;
 use std::io::Write;
 
+use retry::delay::Fibonacci;
+use tokio::runtime::Runtime;
+
 #[derive(Clone)]
 pub(crate) struct SonarClient {
     url: String,
-    token: String,
+    token: String
 }
 
 impl fmt::Debug for SonarClient {
@@ -43,9 +44,11 @@ impl SonarClient {
             .header(reqwest::header::AUTHORIZATION, self.header_authorization())
             .build()?;
 
-        send::<QualityStatus>(request_builder).await
+        ApiCallRemoteAdapter{}.send::<QualityStatus>(request_builder).await
     }
 
+    // Cannot be async, because async closures are unstable and closure is mandatory for retry_with_index
+    // for more information, see https://github.com/rust-lang/rust/issues/62290
     pub fn analysis_id(&self, task_id: &str) -> anyhow::Result<SonarBackgroundTask> {
         let result = retry_with_index(Fibonacci::from_millis(1000), |current_try| {
             if current_try > 9 {
@@ -71,13 +74,15 @@ impl SonarClient {
         }
     }
 
-    fn get_task(&self, task_id: &&str) -> anyhow::Result<SonarBackgroundTask> {
-        let request_builder = reqwest::blocking::Client::new()
+    fn get_task(&self, task_id: &str) -> anyhow::Result<SonarBackgroundTask> {
+        let request = reqwest::Client::new()
             .get(&format!("{}/api/ce/task", self.url))
             .query(&[("id", task_id)])
-            .header(reqwest::header::AUTHORIZATION, self.header_authorization());
+            .header(reqwest::header::AUTHORIZATION, self.header_authorization())
+            .build()?;
 
-        let res = send_request_blocking::<Task>(request_builder)?;
+        let mut rt = Runtime::new().expect("tokio runtime can be initialized");
+        let res = rt.block_on(ApiCallRemoteAdapter{}.send::<Task>(request))?;
         debug!("{:?}", res.task);
         Ok(res.task)
     }

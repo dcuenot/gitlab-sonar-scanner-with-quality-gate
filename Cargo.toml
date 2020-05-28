@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0"
+async-trait = "0.1"
 base64 = "0.12"
 Inflector = "0.5"
 log = "0.4"

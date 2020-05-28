@@ -1,8 +1,7 @@
 use crate::domain::gitlab::merge_requests::MergeRequests;
 use crate::domain::gitlab::note::Note;
 use crate::domain::sonar::QualityStatus;
-use crate::infra::api_call::remote_api_call::send;
-use log::*;
+use crate::infra::api_call_remote::ApiCallRemoteAdapter;
 use reqwest::header::HeaderValue;
 
 #[derive(Clone)]
@@ -35,7 +34,7 @@ impl GitlabClient {
             .header("PRIVATE-TOKEN", self.header_authorization())
             .build()?;
 
-        let res = send::<MergeRequests>(request).await?;
+        let res = ApiCallRemoteAdapter{}.send::<MergeRequests>(request).await?;
         debug!("{:?}", res);
         Ok(res)
     }
@@ -56,7 +55,7 @@ impl GitlabClient {
             .header("PRIVATE-TOKEN", self.header_authorization())
             .build()?;
 
-        let _res = send::<()>(request).await;
+        let _res = ApiCallRemoteAdapter{}.send::<()>(request).await;
         debug!("Note successfully written in Gitlab: {:?}", note);
         Ok(())
     }
