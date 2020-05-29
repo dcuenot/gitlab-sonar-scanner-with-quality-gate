@@ -24,7 +24,7 @@ const ENV_NAME_GITLAB_PROJECT_ID: &str = "CI_PROJECT_ID";
 
 pub fn process_quality_gate(
     report_task_path: PathBuf,
-    gitlab_private_token: Option<String>,
+    gitlab_personal_token: Option<String>,
 ) -> anyhow::Result<QualityStatus> {
     let params = SonarAnalysisParams::from_report_task(report_task_path);
 
@@ -44,7 +44,7 @@ pub fn process_quality_gate(
             .quality_gate_status(&task.analysis_id)
             .await?;
 
-        if let Some(private_token) = gitlab_private_token {
+        if let Some(personal_token) = gitlab_personal_token {
             let hint = "It seems this script is not running in a Gitlab pipeline";
             if env::var(ENV_NAME_GITLAB_URL).is_err() {
                 bail!(
@@ -63,7 +63,7 @@ pub fn process_quality_gate(
 
             let gitlab_client = GitlabClient::new(
                 &env::var(ENV_NAME_GITLAB_URL).unwrap(),
-                &private_token,
+                &personal_token,
                 env::var(ENV_NAME_GITLAB_PROJECT_ID)
                     .unwrap()
                     .parse::<i64>()?,

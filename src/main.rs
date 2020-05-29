@@ -19,10 +19,10 @@ struct Options {
 
     #[structopt(
         short = "g",
-        long = "gitlab_private_token",
-        env = "GITLAB_PRIVATE_TOKEN"
+        long = "gitlab_personal_token",
+        env = "GITLAB_PERSONAL_TOKEN"
     )]
-    gitlab_private_token: Option<String>,
+    gitlab_personal_token: Option<String>,
 
     // The number of occurrences of the `v/verbose` flag
     /// Verbose mode (-v, -vv, -vvv, etc.)
@@ -34,7 +34,7 @@ fn main() {
     let options = Options::from_args();
     config_logger(options.verbose);
 
-    match process_quality_gate(options.report_task_path, options.gitlab_private_token) {
+    match process_quality_gate(options.report_task_path, options.gitlab_personal_token) {
         Ok(result) => {
             println!("{}", result.display());
         }

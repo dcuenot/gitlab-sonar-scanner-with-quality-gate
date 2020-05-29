@@ -104,5 +104,5 @@ jobs:
           cd gitlab-sonar-scanner-docker
           cp -r ../Cargo.* ../src .
           docker login
-          docker build . -t dcuenot/sonar-scanner:latest
-          docker push dcuenot/sonar-scanner:latest
+          docker build . -t dcuenot/gitlab-sonar-scanner:latest
+          docker push dcuenot/gitlab-sonar-scanner:latest
