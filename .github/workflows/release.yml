@@ -40,7 +40,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
@@ -111,3 +110,19 @@ jobs:
           asset_path: sonar_quality_gate.zip
           asset_name: sonar-quality-gate-darwin-x86_64
           asset_content_type: application/x-mach-binary
+
+    build-docker-image:
+      needs: [check, test, fmt, clippy]
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - uses: azure/docker-login@v1
+          with:
+            username: dcuenot
+            password: ${{ secrets.DOCKER_PASSWORD }}
+        - run: |
+            cd gitlab-sonar-scanner-docker
+            cp -r ../Cargo.* ../src .
+            docker login
+            docker build . -t dcuenot/gitlab-sonar-scanner:${{ github.ref }}
+            docker push dcuenot/gitlab-sonar-scanner:${{ github.ref }}
