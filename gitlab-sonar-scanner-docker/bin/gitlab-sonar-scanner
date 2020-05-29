@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-echo "PLOP"
 declare -a args
 
 add_env_var_as_env_prop() {
