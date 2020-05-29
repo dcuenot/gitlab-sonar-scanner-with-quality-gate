@@ -5,6 +5,7 @@ ADD --chown=rust:rust sonar-cli/Cargo.toml ./
 ADD --chown=rust:rust sonar-cli/Cargo.lock ./
 ADD --chown=rust:rust sonar-cli/src ./
 
+RUN ls -al ./
 RUN cargo build --release
 
 RUN cargo install --path .
