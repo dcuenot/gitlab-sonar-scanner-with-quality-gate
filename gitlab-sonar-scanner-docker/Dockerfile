@@ -4,15 +4,12 @@ FROM ekidd/rust-musl-builder AS builder
 RUN USER=root cargo new sonar-cli
 WORKDIR ./sonar-cli
 
-ADD --chown=rust:rust sonar-cli/Cargo.toml ./
-ADD --chown=rust:rust sonar-cli/Cargo.lock ./
+ADD --chown=rust:rust ../Cargo.toml ./
+ADD --chown=rust:rust ../Cargo.lock ./
 RUN cargo build --release
 
-ADD --chown=rust:rust sonar-cli/src ./src
+ADD --chown=rust:rust ../src ./src
 RUN cargo install --target x86_64-unknown-linux-musl --path .
-RUN pwd
-RUN ls -la
-RUN ls /home/rust/.cargo/bin/
 
 # Bundle Stage
 FROM openjdk:11-jre-slim

@@ -1,4 +1,7 @@
 # Project Specific .gitignore
+/proptest-regressions
+sign_macos.json
+test-report-tasks-2.txt
 
 # End of project Specific
 

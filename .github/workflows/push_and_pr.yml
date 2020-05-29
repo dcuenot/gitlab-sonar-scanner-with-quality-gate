@@ -2,10 +2,6 @@ on: [push, pull_request]
 
 name: Continuous integration
 
-defaults:
-  run:
-    working-directory: sonar-cli
-
 jobs:
   check:
     name: Check
@@ -96,15 +92,17 @@ jobs:
           args: -- -D warnings
 
   build-docker-image:
+    needs: [check, test, fmt, clippy]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: azure/docker-login@v1
+      - uses: azure/gitlab-sonar-scanner-docker-login@v1
         with:
           username: dcuenot
           password: ${{ secrets.DOCKER_PASSWORD }}
       - run: |
-          cd ..
+          cd gitlab-sonar-scanner-docker
+          cp -r ../Cargo.* ../src .
           docker login
           docker build . -t dcuenot/sonar-scanner:latest
           docker push dcuenot/sonar-scanner:latest
