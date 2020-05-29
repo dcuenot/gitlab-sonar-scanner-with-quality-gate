@@ -93,7 +93,7 @@ License
 
 All the code contained in this repository is licensed under a MIT License.
 
-See [LICENSE.md](LICENSE.md) for more details
+See [LICENSE](LICENSE) for more details
 
 Contribution
 ============
