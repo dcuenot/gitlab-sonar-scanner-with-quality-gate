@@ -3,10 +3,11 @@ FROM ekidd/rust-musl-builder AS builder
 
 ADD --chown=rust:rust sonar-cli/Cargo.toml ./
 ADD --chown=rust:rust sonar-cli/Cargo.lock ./
-RUN cargo install
+RUN cargo build --release
+
 
 ADD --chown=rust:rust sonar-cli/src ./
-RUN cargo build --release
+RUN cargo install --path .
 
 
 # Bundle Stage
