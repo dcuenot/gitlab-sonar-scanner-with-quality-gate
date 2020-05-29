@@ -3,7 +3,7 @@ FROM ekidd/rust-musl-builder AS builder
 
 ADD --chown=rust:rust sonar-cli/Cargo.toml ./
 ADD --chown=rust:rust sonar-cli/Cargo.lock ./
-ADD --chown=rust:rust sonar-cli/src ./
+ADD --chown=rust:rust sonar-cli/src ./src
 
 RUN ls -al ./
 RUN cargo build --release
