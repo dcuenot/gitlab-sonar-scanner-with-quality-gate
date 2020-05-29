@@ -1,15 +1,18 @@
 # Build Stage
 FROM ekidd/rust-musl-builder AS builder
 
+RUN USER=root cargo new sonar-cli
+WORKDIR ./sonar-cli
+
 ADD --chown=rust:rust sonar-cli/Cargo.toml ./
 ADD --chown=rust:rust sonar-cli/Cargo.lock ./
-ADD --chown=rust:rust sonar-cli/src ./src
-
-RUN ls -al ./
 RUN cargo build --release
 
-RUN cargo install --path .
-
+ADD --chown=rust:rust sonar-cli/src ./src
+RUN cargo install --target x86_64-unknown-linux-musl --path .
+RUN pwd
+RUN ls -la
+RUN ls /home/rust/.cargo/bin/
 
 # Bundle Stage
 FROM openjdk:11-jre-slim
@@ -50,7 +53,7 @@ RUN tar Jxf nodejs.tar.xz \
     && mv node-${NODEJS_VERSION}-linux-x64 ${NODEJS_HOME} \
     && npm install -g typescript@3.8.3
 
-COPY --from=builder --chown=scanner-cli:scanner-cli /usr/local/cargo/bin/sonar-cli /usr/bin/
+COPY --from=builder --chown=scanner-cli:scanner-cli /home/rust/.cargo/bin/ /usr/bin/
 
 WORKDIR /usr/src
 USER scanner-cli
