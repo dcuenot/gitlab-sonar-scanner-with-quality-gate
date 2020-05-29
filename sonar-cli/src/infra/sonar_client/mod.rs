@@ -64,7 +64,7 @@ impl SonarClient {
                     OperationResult::Retry("Incorrect status")
                 }
                 Err(e) => {
-                    error!("{}. {}", current_try, e);
+                    warning!("{}. Task is not available yet", current_try, e);
                     OperationResult::Retry("Error during API call")
                 }
             }
