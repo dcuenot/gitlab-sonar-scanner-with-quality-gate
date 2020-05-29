@@ -6,6 +6,7 @@ use crate::domain::sonar::QualityStatus;
 use crate::infra::api_call_remote::ApiCallRemoteAdapter;
 use base64::write::EncoderWriter as Base64Encoder;
 use core::fmt;
+use log::*;
 use reqwest::header::HeaderValue;
 use std::io::Write;
 
@@ -64,7 +65,7 @@ impl SonarClient {
                     OperationResult::Retry("Incorrect status")
                 }
                 Err(e) => {
-                    error!("{}. {}", current_try, e);
+                    debug!("{}. Task is not available yet ({})", current_try, e);
                     OperationResult::Retry("Error during API call")
                 }
             }

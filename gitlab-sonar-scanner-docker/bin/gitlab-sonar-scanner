@@ -1,0 +1,46 @@
+#!/bin/bash
+
+set -euo pipefail
+
+declare -a args
+
+add_env_var_as_env_prop() {
+  if [ "$1" ]; then
+    args+=("-D$2=$1")
+  fi
+}
+
+if [ -z "${SONAR_URL}" ]; then
+  echo "Undefined \"SONAR_URL\" env" && exit 1
+fi
+
+PROJECT_BASE_DIR="$PWD"
+if [ "${SONAR_PROJECT_BASE_DIR:-}" ]; then
+  PROJECT_BASE_DIR="${SONAR_PROJECT_BASE_DIR}"
+fi
+
+export SONAR_USER_HOME="$PROJECT_BASE_DIR/.sonar"
+
+
+# Authentication
+add_env_var_as_env_prop "${SONAR_URL:-}"              "sonar.host.url"
+add_env_var_as_env_prop "${SONAR_LOGIN:-}"            "sonar.login"
+add_env_var_as_env_prop "${SONAR_TOKEN:-}"            "sonar.login"
+add_env_var_as_env_prop "${SONAR_PASSWORD:-}"         "sonar.password"
+add_env_var_as_env_prop "${SONAR_USER_HOME:-}"        "sonar.userHome"
+
+# Project informations
+add_env_var_as_env_prop "${SONAR_PROJECT_KEY:-}"      "sonar.projectKey"
+add_env_var_as_env_prop "${SONAR_PROJECT_NAME:-}"     "sonar.projectName"
+add_env_var_as_env_prop "${SONAR_PROJECT_BASE_DIR:-}" "sonar.projectBaseDir"
+add_env_var_as_env_prop "${CI_COMMIT_REF_SLUG:-}"     "sonar.projectVersion"
+
+# Gitlab information
+add_env_var_as_env_prop "${CI_PROJECT_ID:-}"          "sonar.gitlab.project_id"
+add_env_var_as_env_prop "${CI_COMMIT_REF_NAME:-}"     "sonar.gitlab.ref_name"
+add_env_var_as_env_prop "${CI_COMMIT_SHA:-}"          "sonar.gitlab.commit_sha"
+
+if [ ${#args[@]} -ne 0 ]; then
+  sonar-scanner "${args[@]}" "${@:2}"
+fi
+

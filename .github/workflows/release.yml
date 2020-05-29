@@ -8,6 +8,10 @@ on:
 
 name: Create Release
 
+defaults:
+  run:
+    working-directory: sonar-cli
+
 jobs:
   create_release:
     name: Create Release
