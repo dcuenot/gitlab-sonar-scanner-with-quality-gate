@@ -1,16 +1,12 @@
 # Build Stage
 FROM ekidd/rust-musl-builder AS builder
-WORKDIR /usr/src/
-RUN rustup target add x86_64-unknown-linux-musl
 
-RUN USER=rust cargo new sonar-cli
-WORKDIR /usr/src/sonar-cli
-COPY sonar-cli/Cargo.toml ./
-COPY sonar-cli/Cargo.lock ./
+ADD --chown=rust:rust sonar-cli/Cargo.toml ./
+ADD --chown=rust:rust sonar-cli/Cargo.lock ./
+RUN cargo install
+
+ADD --chown=rust:rust sonar-cli/src ./
 RUN cargo build --release
-
-COPY sonar-cli/src ./src
-RUN cargo install --target x86_64-unknown-linux-musl --path .
 
 
 # Bundle Stage
