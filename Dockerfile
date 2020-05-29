@@ -3,7 +3,7 @@ FROM ekidd/rust-musl-builder AS builder
 WORKDIR /usr/src/
 RUN rustup target add x86_64-unknown-linux-musl
 
-RUN USER=root cargo new sonar-cli
+RUN cargo new sonar-cli
 WORKDIR /usr/src/sonar-cli
 COPY sonar-cli/Cargo.toml ./
 COPY sonar-cli/Cargo.lock ./
