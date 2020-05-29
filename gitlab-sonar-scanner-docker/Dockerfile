@@ -4,11 +4,11 @@ FROM ekidd/rust-musl-builder AS builder
 RUN USER=root cargo new sonar-cli
 WORKDIR ./sonar-cli
 
-ADD --chown=rust:rust ../Cargo.toml ./
-ADD --chown=rust:rust ../Cargo.lock ./
+ADD --chown=rust:rust ./Cargo.toml ./
+ADD --chown=rust:rust ./Cargo.lock ./
 RUN cargo build --release
 
-ADD --chown=rust:rust ../src ./src
+ADD --chown=rust:rust ./src ./src
 RUN cargo install --target x86_64-unknown-linux-musl --path .
 
 # Bundle Stage
