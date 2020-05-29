@@ -1,5 +1,5 @@
 # Build Stage
-FROM rust:1-slim AS builder
+FROM ekidd/rust-musl-builder AS builder
 WORKDIR /usr/src/
 RUN rustup target add x86_64-unknown-linux-musl
 
