@@ -1,8 +1,9 @@
 # Gitlab Sonar Scanner & Quality Gate
 
-[![Continuous integration](https://github.com/dcuenot/sonar-qg-in-cli/workflows/Continuous%20integration/badge.svg)](https://github.com/dcuenot/sonar-qg-in-cli/actions?query=workflow%3A%22Continuous+integration%22)
-[![Security audit](https://github.com/dcuenot/sonar-qg-in-cli/workflows/Security%20audit/badge.svg)](https://github.com/dcuenot/sonar-qg-in-cli/actions?query=workflow%3A%22Security+audit%22)
-[![codecov](https://codecov.io/gh/dcuenot/sonar-qg-in-cli/branch/master/graph/badge.svg)](https://codecov.io/gh/dcuenot/sonar-qg-in-cli)
+[![Continuous integration](https://github.com/dcuenot/gitlab-sonar-scanner-with-quality-gate/workflows/Continuous%20integration/badge.svg)](https://github.com/dcuenot/gitlab-sonar-scanner-with-quality-gate/actions?query=workflow%3A%22Continuous+integration%22)
+[![Security audit](https://github.com/dcuenot/gitlab-sonar-scanner-with-quality-gate/workflows/Security%20audit/badge.svg)](https://github.com/dcuenot/gitlab-sonar-scanner-with-quality-gate/actions?query=workflow%3A%22Security+audit%22)
+[![codecov](https://codecov.io/gh/dcuenot/gitlab-sonar-scanner-with-quality-gate/branch/master/graph/badge.svg)](https://codecov.io/gh/dcuenot/gitlab-sonar-scanner-with-quality-gate)
+[![Docker pull](https://img.shields.io/docker/pulls/dcuenot/gitlab-sonar-scanner)](https://hub.docker.com/repository/docker/dcuenot/gitlab-sonar-scanner)
 
 Work inspired by [ciricihq/gitlab-sonar-scanner](https://github.com/ciricihq/gitlab-sonar-scanner)
 

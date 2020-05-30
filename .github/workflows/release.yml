@@ -117,6 +117,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
       - uses: azure/docker-login@v1
         with:
           username: dcuenot
@@ -124,6 +127,7 @@ jobs:
       - run: |
           cd gitlab-sonar-scanner-docker
           cp -r ../Cargo.* ../src .
+          ls -al
           docker login
-          docker build . -t dcuenot/gitlab-sonar-scanner:${{ github.ref }}
-          docker push dcuenot/gitlab-sonar-scanner:${{ github.ref }}
+          docker build . -t dcuenot/gitlab-sonar-scanner:${{ steps.get_version.outputs.VERSION }}
+          docker push dcuenot/gitlab-sonar-scanner:${{ steps.get_version.outputs.VERSION }}
