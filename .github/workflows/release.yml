@@ -91,6 +91,7 @@ jobs:
       - name: Install gon via HomeBrew for code signing and app notarization
         if: matrix.os == 'macos-latest'
         run: |
+          brew update
           brew tap mitchellh/gon
           brew install mitchellh/gon/gon
       - name: Sign and Notarize CLI
