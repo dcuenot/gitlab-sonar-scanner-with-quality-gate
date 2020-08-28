@@ -37,6 +37,11 @@ fn main() {
     match process_quality_gate(options.report_task_path, options.gitlab_personal_token) {
         Ok(result) => {
             println!("{}", result.display());
+            if result.project_status.status == "OK" {
+                std::process::exit(exitcode::OK);
+            } else {
+                std::process::exit(exitcode::DATAERR);
+            }
         }
         Err(e) => error!("Error: {:#?}", e),
     };
