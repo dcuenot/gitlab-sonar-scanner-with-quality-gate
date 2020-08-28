@@ -73,7 +73,7 @@ impl SonarAnalysisParams {
                 line.lines()
                     .map(|l| {
                         let s: String = l.into();
-                        let pos = s.clone().find('=').expect("No char '=' found");
+                        let pos = s.find('=').expect("No char '=' found");
                         (s[..pos].to_string(), s[(pos + 1)..].to_string())
                     })
                     .collect::<HashMap<String, String>>()

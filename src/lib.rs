@@ -34,7 +34,7 @@ pub fn process_quality_gate(
     let sonar_token = env::var(ENV_NAME_SONAR_TOKEN).unwrap();
 
     let sonar_client = SonarClient::new(&params.server_url, &sonar_token);
-    let task = sonar_client.clone().analysis_id(&params.ce_task_id)?;
+    let task = sonar_client.analysis_id(&params.ce_task_id)?;
 
     // TODO: Define Trait for Sonar Client
     let mut rt = Runtime::new().expect("tokio runtime can be initialized");

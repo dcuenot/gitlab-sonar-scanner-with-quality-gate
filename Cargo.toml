@@ -10,6 +10,7 @@ edition = "2018"
 anyhow = "1.0"
 async-trait = "0.1"
 base64 = "0.12"
+exitcode = "1.1.2"
 Inflector = "0.5"
 log = "0.4"
 reqwest = { version = "0.10", features = ["json", "blocking"] }
