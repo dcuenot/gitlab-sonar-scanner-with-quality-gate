@@ -21,6 +21,7 @@ pub mod infra;
 const ENV_NAME_SONAR_TOKEN: &str = "SONAR_TOKEN";
 const ENV_NAME_GITLAB_URL: &str = "CI_SERVER_URL";
 const ENV_NAME_GITLAB_PROJECT_ID: &str = "CI_PROJECT_ID";
+const ENV_NAME_GITLAB_BRANCH_NAME: &str =  "CI_COMMIT_BRANCH";
 
 pub fn process_quality_gate(
     report_task_path: PathBuf,
@@ -71,7 +72,7 @@ pub fn process_quality_gate(
 
             let opened_mr = gitlab_client
                 .clone()
-                .list_opened_merge_requests("test")
+                .list_opened_merge_requests(&env::var(ENV_NAME_GITLAB_BRANCH_NAME).unwrap())
                 .await?;
 
             for mr in opened_mr.into_iter() {
