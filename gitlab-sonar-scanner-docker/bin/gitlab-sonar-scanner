@@ -39,6 +39,10 @@ add_env_var_as_env_prop "${CI_COMMIT_REF_SLUG:-}"     "sonar.projectVersion"
 add_env_var_as_env_prop "${CI_PROJECT_ID:-}"          "sonar.gitlab.project_id"
 add_env_var_as_env_prop "${CI_COMMIT_REF_NAME:-}"     "sonar.gitlab.ref_name"
 add_env_var_as_env_prop "${CI_COMMIT_SHA:-}"          "sonar.gitlab.commit_sha"
+add_env_var_as_env_prop "${CI_PROJECT_URL:-}"         "sonar.links.homepage"
+add_env_var_as_env_prop "${CI_PROJECT_URL:-}"         "sonar.links.ci"
+add_env_var_as_env_prop "${CI_PROJECT_URL:-}"         "sonar.links.scm"
+
 
 if [ ${#args[@]} -ne 0 ]; then
   sonar-scanner "${args[@]}" "${@:2}"
